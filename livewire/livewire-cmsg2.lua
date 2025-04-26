@@ -251,7 +251,7 @@ function cmsg2_protocol.dissector(buffer, pinfo, tree)
 
     local dissector = child_dissectors:get_dissector(udp_dst_port().value)
     if dissector ~= nil then
-        dissector:call(buffer(16):tvb(), pinfo, tree)
+        dissector:call(buffer():tvb(), pinfo, tree)
     end
 end
 
