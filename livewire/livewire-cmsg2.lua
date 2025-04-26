@@ -188,20 +188,20 @@ function decode_nested(buffer, tree, data)
 end
 
 -- Helper functions
-function get_message_description(msg_type)
+function get_message_description(msg_id)
     local description = "Unknown"
 
-    if msg_type == "WRNI" then
+    if msg_id == "WRNI" then
         description = "Write value - returning the indication is not requested"
-    elseif msg_type == "WRIN" then
+    elseif msg_id == "WRIN" then
         description = "Write value - returning the indication is requested"
-    elseif msg_type == "READ" then
+    elseif msg_id == "READ" then
         description = "Request to read indication"
-    elseif msg_type == "INDI" then
+    elseif msg_id == "INDI" then
         description = "Indication"
-    elseif msg_type == "STAT" then
+    elseif msg_id == "STAT" then
         description = "Status"
-    elseif msg_type == "NEST" then
+    elseif msg_id == "NEST" then
         description = "Container for nested messages"
     end
   
