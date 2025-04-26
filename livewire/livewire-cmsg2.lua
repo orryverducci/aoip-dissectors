@@ -81,12 +81,13 @@ function decode_group(buffer, tree, data)
         local data_type_description = get_data_type_description(data_type:uint())
         local data_length = decode_data_length(buffer(buffer_position + 5), data_type:uint())
 
+        message_data["full"] = buffer(buffer_position, data_length + 5)
         message_data["key"] = key
         message_data["type"] = data_type
 
         local key_string = key:string()
 
-        local subtree = tree:add(cmsg2_protocol, buffer(buffer_position, data_length + 5), "Message " .. tostring(i))
+        local subtree = tree:add(cmsg2_protocol, message_data["full"], "Message " .. tostring(i))
         if string.len(key_string) > 0 then
             subtree:add(cmsg2_key, key):append_text(" (" .. key_string .. ")")
         else
