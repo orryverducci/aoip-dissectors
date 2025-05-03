@@ -100,27 +100,27 @@ function get_pin_number(circuit)
 	return result
 end
 
-function get_state(value)
+function get_state(value, message_type)
     local state = "Unknown"
 
-    if value > 192 then
-        state = "Pulse Low"
-    elseif value == 192 then
-        state = "Low"
-    elseif value > 128 then
-        state = "Pulse High"
-    elseif value == 128 then
-        state = "High"
-    elseif value < 96 and value > 64 then
-        state = "Pulse Low"
-    elseif value == 64 then
-        state = "Low"
-    elseif value < 32 and value > 1 then
-        state = "Pulse High"
-    elseif value == 1 then      -- Special case due to GPI devices (LW library) not following protocol
-        state = "Low"
-    elseif value == 0 then
-        state = "High" 
+    value = bit.band(value, 0x7F)     -- Ignore the most significant bit (pulse scale)
+
+    if message_type == "INDI" then
+        if value == 1 then
+            state = "Low"
+        elseif value == 0 then
+            state = "High" 
+        end
+    elseif message_type == "WRNI" then
+        if value < 96 and value > 64 then
+            state = "Pulse Low"
+        elseif value == 64 then
+            state = "Low"
+        elseif value < 32 and value > 0 then
+            state = "Pulse High"
+        elseif value == 0 then
+            state = "High" 
+        end
     end
   
     return state
@@ -135,7 +135,7 @@ function get_pulse_duration(value)
         duration = (value - 128) * 10
     elseif value < 96 and value > 64 then
         duration = (value - 64) * 250
-    elseif (value < 32 and value > 1) then
+    elseif value < 32 and value > 0 then
         duration = value * 250
     end
   
@@ -178,7 +178,7 @@ function gpio_protocol.dissector(buffer, pinfo, tree)
 
         local pin_type = get_pin_type(pin:uint())
         local pin_number = get_pin_number(pin:uint())
-        local state = get_state(value:uint())
+        local state = get_state(value:uint(), cmsg2_data["id"]:string())
         local pulse_duration = get_pulse_duration(value:uint())
 
         local msg_tree = subtree:add(gpio_protocol, message["full"], "GPIO Message " .. tostring(i))
