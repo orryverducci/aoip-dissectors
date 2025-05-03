@@ -156,13 +156,13 @@ function gpio_protocol.dissector(buffer, pinfo, tree)
     local previous_lw_channel = nil
 
     for i, message in ipairs(cmsg2_data["messages"]) do
+        if message["key"](0, 1):uint() == 0xFF then      -- Auxiliary data messages, which are not yet supported
+            goto continue
+        end
+
         local lw_channel = message["key"](1, 2)
         local pin = message["key"](3, 1)
         local value = nil
-
-        if pin:uint() == 0xFF then      -- Auxillary data packets, which are not yet supported
-            goto continue
-        end
 
         if message["type"]:uint() == 9 then
             value = message["value"](7, 1)
