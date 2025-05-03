@@ -158,10 +158,16 @@ function gpio_protocol.dissector(buffer, pinfo, tree)
     for i, message in ipairs(cmsg2_data["messages"]) do
         local lw_channel = message["key"](1, 2)
         local pin = message["key"](3, 1)
-        local value = message["value"](0, 1)
+        local value = nil
 
         if pin:uint() == 0xFF then      -- Auxillary data packets, which are not yet supported
             goto continue
+        end
+
+        if message["type"]:uint() == 9 then
+            value = message["value"](7, 1)
+        else
+            value = message["value"](0, 1)
         end
 
         if lw_channel:uint() == 65535 and previous_lw_channel ~= nil then     -- If 0xFFFF reuse the previous Livewire channel
