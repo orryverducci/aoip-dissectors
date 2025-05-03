@@ -37,7 +37,23 @@ gpio_protocol.fields = {
     gpio_pulse_duration
 }
 
+-- Get fields
+local udp_dst_port = Field.new("udp.dstport")
+
 -- Helper functions
+function get_message_direction()
+    local direction = "Unknown"
+    local port = udp_dst_port().value
+
+    if port == 2055 then
+        direction = "End point to console"
+    elseif port == 2060 then
+        direction = "Console to end point"
+    end
+  
+    return direction
+end
+
 function get_message_type(msg_id)
     local type = "Unknown"
 
@@ -132,6 +148,7 @@ function gpio_protocol.dissector(buffer, pinfo, tree)
 
     local subtree = tree:add(gpio_protocol, buffer(), "Livewire GPIO")
 
+    subtree:add("Message Direction: " .. get_message_direction())
     subtree:add(gpio_message_type, cmsg2_data["id"], get_message_type(cmsg2_data["id"]:string()))
 
     -- Iterate over each item and add it to the tree and summary
