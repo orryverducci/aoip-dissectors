@@ -41,7 +41,7 @@ gpio_protocol.fields = {
 local udp_dst_port = Field.new("udp.dstport")
 
 -- Helper functions
-function get_message_direction()
+local function get_message_direction()
     local direction = "Unknown"
     local port = udp_dst_port().value
 
@@ -54,7 +54,7 @@ function get_message_direction()
     return direction
 end
 
-function get_message_type(msg_id)
+local function get_message_type(msg_id)
     local type = "Unknown"
 
     if msg_id == "WRNI" then
@@ -68,11 +68,11 @@ function get_message_type(msg_id)
     return type
 end
 
-function get_ip_from_lw_channel(channel)
+local function get_ip_from_lw_channel(channel)
 	return "239.192." .. math.floor(channel / 256) .. "." .. channel % 256
 end
 
-function get_pin_type(circuit)
+local function get_pin_type(circuit)
 	local result
 
 	circuit = bit.band(circuit, 0x0F)  -- bitwise AND the circuit number because Fusion is inserting an F at the MSB
@@ -86,7 +86,7 @@ function get_pin_type(circuit)
 	return result
 end
 
-function get_pin_number(circuit)
+local function get_pin_number(circuit)
 	local result
 
 	circuit = bit.band(circuit, 0x0F)  -- bitwise AND the circuit number because Fusion is inserting an F at the MSB
@@ -100,7 +100,7 @@ function get_pin_number(circuit)
 	return result
 end
 
-function get_state(value, message_type)
+local function get_state(value, message_type)
     local state = "Unknown"
 
     value = bit.band(value, 0x7F)     -- Ignore the most significant bit (pulse scale)
@@ -126,7 +126,7 @@ function get_state(value, message_type)
     return state
 end
 
-function get_pulse_duration(value)
+local function get_pulse_duration(value)
     local duration = 0
 
     if value > 192 then
